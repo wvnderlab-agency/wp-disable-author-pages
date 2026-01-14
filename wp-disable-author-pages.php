@@ -154,13 +154,27 @@ add_action( 'template_redirect', __NAMESPACE__ . '\\disable_or_redirect_author_p
 /**
  * Unregister Author Blocks
  *
- * @link   https://developer.wordpress.org/reference/hooks/init/
- * @hooked action init
+ * @link   https://developer.wordpress.org/reference/hooks/admin_print_scripts/
+ * @hooked action admin_print_scripts
  *
  * @return void
  */
 function unregister_author_blocks(): void {
-	unregister_block_type( 'core/post-author' );
+	$blocks = array(
+		'core/post-author',
+		'core/post-author-biography',
+		'core/post-author-name',
+	);
+
+	echo '<script type="text/javascript">';
+	echo "addEventListener('DOMContentLoaded', function() {";
+	echo 'window.wp.domReady( function() {';
+	foreach ( $blocks as $block ) {
+		echo "window.wp.blocks.unregisterBlockType( '" . esc_js( $block ) . "' );";
+	}
+	echo '} );';
+	echo '} );';
+	echo '</script>';
 }
 
-add_action( 'init', __NAMESPACE__ . '\\unregister_author_blocks', PHP_INT_MAX );
+add_action( 'admin_print_scripts', __NAMESPACE__ . '\\unregister_author_blocks', PHP_INT_MAX );
